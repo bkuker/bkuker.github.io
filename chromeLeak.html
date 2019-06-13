@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <script type="text/javascript">
+
+    function good(){
+      document.getElementById("iframe").srcdoc = document.getElementById("goodContent").value;
+    }
+
+    function bad(){
+      document.getElementById("iframe").srcdoc = document.getElementById("badContent").value;
+    }
+  </script>
+  <title>Chrome Memory Leak - IFrames with Select & Option element leak Documents</title>
+</head>
+
+<body>
+  <h1>Chrome Memory Leak - IFrames with Select & Option element leak Documents</h1>
+  <p>
+    When the content of an IFrame is replaced objects associated with it should eventually be garbage collected.
+    This can be observed in the dev-tools "Performance Monitor" tab, the "Documents" graph in particular.
+  </p>
+  <p>
+    This expected behavior can be observed by repeatedly clicking the green Safe button below.
+    The number of documents increases by one for each click, but occationally resets back to a low number (3
+    in my case but it may vary) as GC occurs.
+  </p>
+  <p>
+    Clicking on the red Bad button, however, creates documents that are never GC'd. The only difference is the
+    Select & Option element. Note the Option must be present for the bug to present.
+  </p>
+
+  <h2>Iframe that will have content set:</h2>
+  <iframe id='iframe' scrolling="no" allowtransparency="true">
+  </iframe>
+  <h2>Controls</h2>
+  <button style='background: #dfd' onClick='good()'>Set Iframe to Safe Content</button>
+  <button style='background: #fdd'onClick='bad()'>Set IFrame to Leaky Content</button>
+
+  <h2>Safe IFrame Contentk:</h2>
+  <textarea id="goodContent" rows='3' cols='50' readonly>
+    <html>
+      <body>I Am Not Leaky</body>
+    </html>
+  </textarea>
+
+  <h2>Leaky IFrame Content:</h2>
+  <textarea id="badContent" rows='6' cols='50' readonly>
+    <html>
+      <body>
+        I Am Leaky
+        <select><option></option></select>
+      </body>
+    </html>
+  </textarea>
+
+  <h2>Example Performance Output:</h2>
+  <img src='performance.png'/>
+</body>
+
+</html>
